@@ -41,8 +41,9 @@ export default function PrincipalsIndex() {
 
     async function listPrincipals() {
         // fetch all todos
-        const { data } = await client.models.Principal.list();
-        setPrincipals(data);
+        console.log(client.models, 'l')
+        const { data } = await client.models.Principal?.list();
+        // setPrincipals(data);
     }
 
     useEffect( () => {
