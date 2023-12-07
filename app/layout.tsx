@@ -1,6 +1,11 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import Navbar from './navbar'
+import { Amplify } from 'aws-amplify';
+import config from '@/amplifyconfiguration.json';
+
+Amplify.configure(config);
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -15,8 +20,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html className="h-full" lang="en">
+    <body className={`${inter.className}`}>
+      <Navbar/>
+      <div className="min-w-full">
+        <main className="">{children}</main>
+      </div>
+      </body>
     </html>
   )
 }
