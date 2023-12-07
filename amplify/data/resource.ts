@@ -17,13 +17,13 @@ const schema = a.schema({
     message: a.string(),
     is_active:a.boolean(),
     tenures: a.hasMany('Tenure'),
-  }).authorization([a.allow.owner(), a.allow.public().to(['read'])]),
+  }).authorization([a.allow.public()]),
   Tenure:a.model({
     id: a.id(),
     appointed_date: a.string(),
     left_date: a.string(),
     principal:a.belongsTo('Principal')
-  }).authorization([a.allow.owner(), a.allow.public().to(['read'])])
+  }).authorization([a.allow.public()])
 });
 
 export type Schema = ClientSchema<typeof schema>;

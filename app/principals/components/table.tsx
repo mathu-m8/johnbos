@@ -2,8 +2,10 @@
 'use client'
 
 import DeleteModel from './deleteModel'
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
+import { generateClient } from 'aws-amplify/data';
+import { Schema } from '@/amplify/data/resource';
 const people:any = [
     {
         full_name: 'Lindsay Walton',
@@ -26,8 +28,29 @@ const people:any = [
     // More people...
 ]
 
+
+
+const client = generateClient<Schema>();
+
+
 export default function PrincipalsIndex() {
     const [isOpenDeleteModel, setIsOpenDeleteModel] = useState(false)
+
+
+    const [principals, setPrincipals] = useState<Schema['Principal'][]>([]);
+
+    async function listPrincipals() {
+        // fetch all todos
+        const { data } = await client.models.Principal.list();
+        setPrincipals(data);
+    }
+
+    useEffect( () => {
+        listPrincipals().then(r => {
+
+        });
+        console.log(principals, 'data')
+    }, []);
     return (
         <div className="px-4 sm:px-6 lg:px-8">
             <div className=" flex flex-col">
