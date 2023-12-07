@@ -67,7 +67,10 @@ export default function PrincipalForm() {
         const file = event.target.files[0];
         const fileReader = new FileReader();
         fileReader.addEventListener("load", () => {
-            setPreviewImage(fileReader.result);
+            if(fileReader.result){
+                // @ts-ignore
+                setPreviewImage(fileReader.result);
+            }
         });
         fileReader.readAsDataURL(file);
         // console.log(file, 'file')
@@ -232,24 +235,22 @@ export default function PrincipalForm() {
                                     />
                                 </div>
                                 <div className="col-span-6 sm:col-span-3">
-                                    <label htmlFor="appointed_date" className="block text-sm font-medium text-gray-700">
+                                    <label htmlFor="appointed_date" className="block text-sm mb-1 font-medium text-gray-700">
                                         Appointed Date
                                     </label>
                                     <Datepicker
                                         value={appointedDate}
                                         useRange={false}
                                         onChange={(value:any)=> setAppointedDate(value)}
-                                        className="mt-1"
                                         asSingle={true}
 
                                     />
                                 </div>
                                 <div className="col-span-6 sm:col-span-3">
-                                    <label htmlFor="left_date" className="block text-sm font-medium text-gray-700">
+                                    <label htmlFor="left_date" className="block text-sm mb-1 font-medium text-gray-700">
                                         Left Date
                                     </label>
                                     <Datepicker
-                                        className="mt-1"
                                         asSingle={true}
                                         useRange={false}
                                         value={leftDate}
