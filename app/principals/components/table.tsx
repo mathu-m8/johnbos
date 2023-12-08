@@ -40,10 +40,17 @@ export default function PrincipalsIndex() {
     const [principals, setPrincipals] = useState<Schema['Principal'][]>([]);
 
     async function listPrincipals() {
-        // fetch all todos
-        console.log(client.models, 'l')
-        const { data } = await client.models.Principal?.list();
-        // setPrincipals(data);
+        try {
+            const response = await client.models.Principal?.list();
+            console.log(response, 'response')
+            if (response && response.data) {
+                const { data } = response;
+                setPrincipals(data);
+            }
+        } catch (error) {
+            // Handle errors here
+            console.error("Error fetching principals:", error);
+        }
     }
 
     useEffect( () => {
