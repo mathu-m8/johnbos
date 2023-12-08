@@ -3,14 +3,10 @@
 import Link from "next/link";
 import {useRef, useState} from "react";
 import {DocumentIcon} from "@heroicons/react/solid";
-    import Datepicker from "react-tailwindcss-datepicker";
+import Datepicker from "react-tailwindcss-datepicker";
 import {Switch} from "@headlessui/react";
 import {usePathname} from "next/navigation";
 import {generateClient} from 'aws-amplify/data';
-import DatePicker from 'react-datepicker';
-import { FaCalendarAlt } from 'react-icons/fa';
-import 'react-datepicker/dist/react-datepicker.css';
-import 'react-datepicker/dist/react-datepicker-cssmodules.css';
 
 function classNames(...classes:any) {
     return classes.filter(Boolean).join(' ')
@@ -317,20 +313,6 @@ export default function PrincipalForm() {
                                     </div>
 
                                 </div>
-                                {/*<div className="col-span-6 sm:col-span-3">*/}
-                                {/*    <label htmlFor="left_date" className="block text-sm mb-1 font-medium text-gray-700">*/}
-                                {/*        Left Date*/}
-                                {/*    </label>*/}
-                                {/*    <div className="relative w-full">*/}
-                                {/*        <DatePicker*/}
-                                {/*            selected={selectedDate}*/}
-                                {/*            onChange={(date:any) => setSelectedDate(date)}*/}
-                                {/*            className="w-full p-2 pl-10 pr-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"*/}
-                                {/*        />*/}
-                                {/*        <FaCalendarAlt className="absolute top-3 left-3 text-gray-500" />*/}
-                                {/*    </div>*/}
-
-                                {/*</div>*/}
                                 <div className="col-span-6 sm:col-span-6">
                                     <label htmlFor="message" className="block text-sm font-medium text-gray-700">
                                         Message
