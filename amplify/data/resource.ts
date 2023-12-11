@@ -10,9 +10,9 @@ authenticated via an API key, can only "read" records.
 const schema = a.schema({
   Principal:a.model({
     id: a.id(),
-    full_name: a.string(),
+    full_name: a.string().required(),
     profile_url: a.string(),
-    email: a.string(),
+    email: a.string().required(),
     phone: a.string(),
     message: a.string(),
     is_active:a.boolean(),
@@ -20,10 +20,13 @@ const schema = a.schema({
   }).authorization([a.allow.public()]),
   Tenure:a.model({
     id: a.id(),
-    appointed_date: a.string(),
+    appointed_date: a.string().required(),
     left_date: a.string(),
     principal:a.belongsTo('Principal')
-  }).authorization([a.allow.public()])
+  }).authorization([a.allow.public()]),
+  Todo: a.model({
+    content: a.string().default("My new Todo")
+  }).authorization([a.allow.public()]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
@@ -31,6 +34,7 @@ export type Schema = ClientSchema<typeof schema>;
 export const data = defineData({
   schema,
   authorizationModes: {
+    allowListedRoleNames: ["userRole"],
     defaultAuthorizationMode: 'apiKey',
     // API Key is used for a.allow.public() rules
     apiKeyAuthorizationMode: {

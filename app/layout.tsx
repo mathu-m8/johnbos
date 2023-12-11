@@ -1,12 +1,15 @@
+
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import Navbar from './navbar'
 import { Amplify } from 'aws-amplify';
 import config from '@/amplifyconfiguration.json';
+import ConfigureAmplifyClientSide from "@/app/componets/ConfigureAmplifyClientSide";
 
-Amplify.configure(config);
-
+Amplify.configure(config, {
+  ssr: true
+});
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
@@ -24,7 +27,10 @@ export default function RootLayout({
     <body className={`${inter.className}`}>
       <Navbar/>
       <div className="min-w-full">
-        <main className="">{children}</main>
+        <main className="">
+          <ConfigureAmplifyClientSide />
+          {children}
+        </main>
       </div>
       </body>
     </html>

@@ -5,7 +5,7 @@ import DeleteModel from './deleteModel'
 import {useEffect, useState} from "react";
 
 import { generateClient } from 'aws-amplify/data';
-import { Schema } from '@/amplify/data/resource';
+import { type Schema } from '@/amplify/data/resource';
 const people:any = [
     {
         full_name: 'Lindsay Walton',
@@ -41,12 +41,21 @@ export default function PrincipalsIndex() {
 
     async function listPrincipals() {
         try {
-            const response = await client.models.Principal?.list();
-            console.log(response, 'response')
-            if (response && response.data) {
-                const { data } = response;
-                setPrincipals(data);
-            }
+            // const response:any = []
+            const response = await client.models.Principal?.list({  authMode: 'apiKey'});
+            // const data = await client.models.Principal?.create({
+            //     full_name: "check",
+            //     email: "",
+            //     is_active: false,
+            //     phone: "",
+            //     message: ""
+            // });
+            console.log(8);
+            // console.log(response, 'response')
+            // if (response && response.data) {
+            //     const { data } = response;
+            //     setPrincipals(data);
+            // }
         } catch (error) {
             // Handle errors here
             console.error("Error fetching principals:", error);
