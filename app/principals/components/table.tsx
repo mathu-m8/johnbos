@@ -1,6 +1,5 @@
 /* This example requires Tailwind CSS v2.0+ */
 'use client'
-
 import DeleteModel from './deleteModel'
 import {useEffect, useState} from "react";
 
@@ -42,7 +41,8 @@ export default function PrincipalsIndex() {
     async function listPrincipals() {
         try {
             // const response:any = []
-            const response = await client.models.Principal?.list({  authMode: 'apiKey'});
+            const {data:items, errors} = await client.models.Principal.list();
+            setPrincipals(items);
             // const data = await client.models.Principal?.create({
             //     full_name: "check",
             //     email: "",
@@ -63,14 +63,13 @@ export default function PrincipalsIndex() {
     }
 
     useEffect( () => {
-        listPrincipals().then(r => {
-
-        });
-        console.log(principals, 'data')
+        listPrincipals()
     }, []);
     return (
         <div className="px-4 sm:px-6 lg:px-8">
             <div className=" flex flex-col">
+
+
                 <DeleteModel  open={isOpenDeleteModel} setOpen={setIsOpenDeleteModel}/>
                 <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
@@ -96,42 +95,50 @@ export default function PrincipalsIndex() {
                                 </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 bg-white">
-                                {people.map((person:any) => (
-                                    <tr key={person.email}>
-                                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                                            <div className="flex items-center">
-                                                <div className="h-10 w-10 flex-shrink-0">
-                                                    <img className="h-10 w-10 rounded-full" src={person.profile_url} alt="" />
-                                                </div>
-                                                <div className="ml-4">
-                                                    <div className="font-medium text-gray-900">{person.full_name}</div>
-                                                    <div className="text-gray-500">{person.email}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                            <div className="text-gray-900">{person.appointed_date}</div>
-                                        </td>
-                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                            <div className="text-gray-900">{person.appointed_date}</div>
-                                        </td>
-                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        <span className={person.status === 'active' ? 'inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800' : 'inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold leading-5 text-red-800'}>
-                          {person.status === 'active'  ? 'Active' : 'Inactive'}
-                        </span>
-                                        </td>
-                                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 space-x-2">
-                                            <a href="/principals/1/edit" className="text-blue-950 hover:text-blue-900">
-                                                Edit
-                                                <span className="sr-only">, {person.name}</span>
-                                            </a>
-                                            <button type="button" className="text-red-600 hover:text-red-900"  onClick={(value)=> setIsOpenDeleteModel(true)}>
-                                                Delete
-                                                <span className="sr-only">, {person.name}</span>
-                                            </button>
-                                        </td>
+                                {principals.length ?
+                                   <>
+                                       {principals.map((person:any) => (
+                                           <tr key={person.email}>
+                                               <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                                                   <div className="flex items-center">
+                                                       <div className="h-10 w-10 flex-shrink-0">
+                                                           <img className="h-10 w-10 rounded-full" src={person.profile_url} alt="" />
+                                                       </div>
+                                                       <div className="ml-4">
+                                                           <div className="font-medium text-gray-900">{person.full_name}</div>
+                                                           <div className="text-gray-500">{person.email}</div>
+                                                       </div>
+                                                   </div>
+                                               </td>
+                                               <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                   <div className="text-gray-900">{person.appointed_date}</div>
+                                               </td>
+                                               <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                   <div className="text-gray-900">{person.appointed_date}</div>
+                                               </td>
+                                               <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                <span className={person.status === 'active' ? 'inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800' : 'inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold leading-5 text-red-800'}>
+                                  {person.status === 'active'  ? 'Active' : 'Inactive'}
+                                </span>
+                                               </td>
+                                               <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 space-x-2">
+                                                   <a href="/principals/1/edit" className="text-blue-950 hover:text-blue-900">
+                                                       Edit
+                                                       <span className="sr-only">, {person.name}</span>
+                                                   </a>
+                                                   <button type="button" className="text-red-600 hover:text-red-900"  onClick={(value)=> setIsOpenDeleteModel(true)}>
+                                                       Delete
+                                                       <span className="sr-only">, {person.name}</span>
+                                                   </button>
+                                               </td>
+                                           </tr>
+                                       ))}
+                                   </>
+                                :
+                                    <tr>
+                                        <td className="whitespace-nowrap py-4 pl-4 pr-3  sm:pl-6 text-center text-gray-500 text-md" colSpan={5}>No data available in table</td>
                                     </tr>
-                                ))}
+                                }
                                 </tbody>
                             </table>
                         </div>

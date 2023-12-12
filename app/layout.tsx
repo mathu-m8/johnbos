@@ -3,13 +3,9 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import Navbar from './navbar'
-import { Amplify } from 'aws-amplify';
-import config from '@/amplifyconfiguration.json';
 import ConfigureAmplifyClientSide from "@/app/componets/ConfigureAmplifyClientSide";
 
-Amplify.configure(config, {
-  ssr: true
-});
+
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {

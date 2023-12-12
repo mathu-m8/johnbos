@@ -6,9 +6,19 @@ import {Fragment} from 'react'
 import Link from "next/link";
 import PrincipalForm from "../components/form";
 import {ArrowLeftIcon} from "@heroicons/react/solid";
+import { generateClient } from 'aws-amplify/data';
+import {Schema} from "@/amplify/data/resource";
 
+const client = generateClient<Schema>();
 
 export default function PrincipalCreate() {
+    const onsubmit = async (principal:['Principal'])=> {
+        console.log(principal, 'date')
+
+        // @ts-ignore
+        const  { errors, data: newTodo } = await client.models.Principal.create(principal)
+        console.log(newTodo, 'create')
+    }
     return (
         <>
             <div className="mt-10 p-10 ">
@@ -34,7 +44,7 @@ export default function PrincipalCreate() {
                 <main>
                     <div className="max-w-full mx-auto sm:px-6 lg:px-8">
                         <div className="px-4  sm:px-0">
-                            <PrincipalForm/>
+                            <PrincipalForm onSavePrincipalData={onsubmit}/>
                         </div>
                     </div>
                 </main>

@@ -50,11 +50,11 @@ export default function Home() {
     //     }
     //     fetchData();
     // }, []);
-    const  fetchTodos = async () =>{
-        const response = await cookieBasedClient.models?.Todo?.list()
-        console.log(response, 'response')
-    }
-    useEffect(() => { fetchTodos() }, [])
+    // const  fetchTodos = async () =>{
+    //     const response = await cookieBasedClient.models?.Todo?.list()
+    //     console.log(response, 'response')
+    // }
+    // useEffect(() => { fetchTodos() }, [])
 
 
 

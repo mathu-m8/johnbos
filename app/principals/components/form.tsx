@@ -12,7 +12,8 @@ function classNames(...classes:any) {
     return classes.filter(Boolean).join(' ')
 }
 
-export default function PrincipalForm() {
+// @ts-ignore
+export default function PrincipalForm({onSavePrincipalData}) {
     const client = generateClient();
     const [selectedDate, setSelectedDate] = useState(null);
 
@@ -48,7 +49,7 @@ export default function PrincipalForm() {
     // const router = useRouter();
     const pathName = usePathname();
 
-    console.log(pathName, 'kk')
+    // console.log(pathName, 'kk')
     const [principal, setPrincipal] = useState({
         full_name: "",
         email: "",
@@ -64,7 +65,7 @@ export default function PrincipalForm() {
 
     const onChange = (e:any) =>{
         setPrincipal({ ...principal, [e.target.name]: e.target.value })
-        console.log(principal, 'principal');
+        // console.log(principal, 'principal');
 
     }
 
@@ -105,31 +106,31 @@ export default function PrincipalForm() {
         setIsActive(!isActive)
         console.log(isActive, 'isActibe')
     }
-    const onsubmit = async (event:Event)=> {
-        console.log(principal, 'date')
-
-        // const { errors, data: newTodo } = await client.models.Principal.create(principal)
-        // const { data: todos, errors }  = await client.models.Principal.list()
-
-        // console.log(data, 'api')
-        // event.preventDefault()
-        // setIsLoading(true) // Set loading to true when the request starts
-        //
-        // try {
-        //     const formData = new FormData(event.currentTarget)
-        //     console.log(formData, 'check')
-        //
-        //     // router.push('/')
-        //
-        //     // Handle response if necessary
-        //     // ...
-        // } catch (error) {
-        //     // Handle error if necessary
-        //     console.error(error)
-        // } finally {
-        //     setIsLoading(false) // Set loading to false when the request completes
-        // }
-    }
+    // const onsubmit = async (event:Event)=> {
+    //     console.log(principal, 'date')
+    //
+    //     // const { errors, data: newTodo } = await client.models.Principal.create(principal)
+    //     // const { data: todos, errors }  = await client.models.Principal.list()
+    //
+    //     // console.log(data, 'api')
+    //     // event.preventDefault()
+    //     // setIsLoading(true) // Set loading to true when the request starts
+    //     //
+    //     // try {
+    //     //     const formData = new FormData(event.currentTarget)
+    //     //     console.log(formData, 'check')
+    //     //
+    //     //     // router.push('/')
+    //     //
+    //     //     // Handle response if necessary
+    //     //     // ...
+    //     // } catch (error) {
+    //     //     // Handle error if necessary
+    //     //     console.error(error)
+    //     // } finally {
+    //     //     setIsLoading(false) // Set loading to false when the request completes
+    //     // }
+    // }
 
     return (
         <div className="space-y-6 px-4 sm:px-6 lg:px-8">
@@ -344,7 +345,7 @@ export default function PrincipalForm() {
                 </Link>
                 <button
                     type="button"
-                    onClick={()=> onsubmit}
+                    onClick={()=> onSavePrincipalData(principal)}
                     className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm
                     font-medium rounded-md text-white bg-blue-950 hover:bg-blue-900 focus:outline-none focus:ring-2
                      focus:ring-offset-2 focus:ring-blue-900"
