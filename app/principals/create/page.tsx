@@ -14,9 +14,11 @@ const client = generateClient<Schema>();
 export default function PrincipalCreate() {
     const onsubmit = async (principal:['Principal'])=> {
         console.log(principal, 'date')
-
+ const data = {
+     email: "test1@gmail.com", full_name: "test"}
+ }
         // @ts-ignore
-        const  { errors, data: newTodo } = await client.models.Principal.create(principal)
+        const  { errors, data: newTodo } = await client.models.Principal.create(data)
         console.log(newTodo, 'create')
     }
     return (
