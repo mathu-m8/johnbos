@@ -1,20 +1,24 @@
 'use client'
-
 import Link from "next/link";
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {DocumentIcon} from "@heroicons/react/solid";
 import Datepicker from "react-tailwindcss-datepicker";
 import {Switch} from "@headlessui/react";
 import {usePathname} from "next/navigation";
-import {generateClient} from 'aws-amplify/data';
+import {generateClient} from "aws-amplify/data";
+import {Schema} from "@/amplify/data/resource";
+import DeleteModel from './deleteModel'
+import ActivePrincipalWarningModel from './activePrincipalWarningModel'
+import {is} from "date-fns/locale";
 
 function classNames(...classes:any) {
     return classes.filter(Boolean).join(' ')
 }
 
+
+const client = generateClient<Schema>()
 // @ts-ignore
-export default function PrincipalForm({onSavePrincipalData}) {
-    const client = generateClient();
+export default function PrincipalForm({onSavePrincipalData, data}) {
     const [selectedDate, setSelectedDate] = useState(null);
 
     const [previewImage, setPreviewImage] = useState('data:image/png;base64,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');
@@ -22,7 +26,8 @@ export default function PrincipalForm({onSavePrincipalData}) {
     const [isLoading, setIsLoading] = useState(false)
     const [isActive, setIsActive] = useState(false);
     const fileInputRef = useRef(null);
-
+    const [isOpenWaringModel, setIsOpenWarningModel] = useState(false);
+    const [activePrincipal, setIsActivePrincipal] = useState<any>();
 
     const handleButtonClick = () => {
         // Simulate click on the hidden file input element
@@ -64,8 +69,8 @@ export default function PrincipalForm({onSavePrincipalData}) {
 
 
     const onChange = (e:any) =>{
+        console.log([e.target.name], 'name')
         setPrincipal({ ...principal, [e.target.name]: e.target.value })
-        // console.log(principal, 'principal');
 
     }
 
@@ -87,7 +92,6 @@ export default function PrincipalForm({onSavePrincipalData}) {
         // API
     }
 
-
     const handleSelectImage = (event:any) => {
         const file = event.target.files[0];
         const fileReader = new FileReader();
@@ -106,34 +110,58 @@ export default function PrincipalForm({onSavePrincipalData}) {
         setIsActive(!isActive)
         console.log(isActive, 'isActibe')
     }
-    // const onsubmit = async (event:Event)=> {
-    //     console.log(principal, 'date')
-    //
-    //     // const { errors, data: newTodo } = await client.models.Principal.create(principal)
-    //     // const { data: todos, errors }  = await client.models.Principal.list()
-    //
-    //     // console.log(data, 'api')
-    //     // event.preventDefault()
-    //     // setIsLoading(true) // Set loading to true when the request starts
-    //     //
-    //     // try {
-    //     //     const formData = new FormData(event.currentTarget)
-    //     //     console.log(formData, 'check')
-    //     //
-    //     //     // router.push('/')
-    //     //
-    //     //     // Handle response if necessary
-    //     //     // ...
-    //     // } catch (error) {
-    //     //     // Handle error if necessary
-    //     //     console.error(error)
-    //     // } finally {
-    //     //     setIsLoading(false) // Set loading to false when the request completes
-    //     // }
-    // }
+
+
+    const onSubmit = async ()=> {
+        // @ts-ignore
+        principal.appointed_date = appointedDate.startDate ?? ""
+        // @ts-ignore
+        principal.left_date = leftDate.startDate ?? ""
+        principal.is_active = isActive ?? ""
+        if(principal.is_active){
+            // @ts-ignore
+            const {data:isActivePrincipal} = await client.models.Principal.list({
+                filter: {
+                    is_active: { eq: true }
+                }
+            })
+            console.log(isActivePrincipal, 'data')
+            if(isActivePrincipal.length ){
+                setIsActivePrincipal(isActivePrincipal[0])
+                if( (data.id && isActivePrincipal[0].id ? data.id != isActivePrincipal[0].id  : true)) {
+                    setIsOpenWarningModel(true)
+                }else {
+                    await onSavePrincipalData(principal)
+                }
+            }else{
+                await onSavePrincipalData(principal)
+            }
+        }else {
+            await onSavePrincipalData(principal)
+        }
+    }
+
+    const onChangeActivePrincipal = async ()=> {
+        console.log(activePrincipal.id, 'ac')
+        await client.models.Principal.update({
+            id:activePrincipal.id,
+            is_active:false
+        })
+        await onSavePrincipalData(principal)
+        setIsOpenWarningModel(false)
+    }
+    useEffect(() => {
+        console.log(data)
+        if(data && data.id){
+            setIsActive(data.is_active)
+            setPrincipal(data)
+        }
+    }, [data]);
 
     return (
         <div className="space-y-6 px-4 sm:px-6 lg:px-8">
+            <ActivePrincipalWarningModel  open={isOpenWaringModel} setOpen={setIsOpenWarningModel} onChangeActivePrincipal={()=> onChangeActivePrincipal()}/>
+
             <div className="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
                 <div className="md:grid md:grid-cols-3 md:gap-6">
                     <div className="md:col-span-3">
@@ -306,6 +334,7 @@ export default function PrincipalForm({onSavePrincipalData}) {
                                     </label>
                                     <div className="w-full">
                                         <Datepicker
+                                            disabled={isActive}
                                             asSingle={true}
                                             useRange={false}
                                             value={leftDate}
@@ -345,7 +374,7 @@ export default function PrincipalForm({onSavePrincipalData}) {
                 </Link>
                 <button
                     type="button"
-                    onClick={()=> onSavePrincipalData(principal)}
+                    onClick={()=> onSubmit()}
                     className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm
                     font-medium rounded-md text-white bg-blue-950 hover:bg-blue-900 focus:outline-none focus:ring-2
                      focus:ring-offset-2 focus:ring-blue-900"
@@ -354,6 +383,7 @@ export default function PrincipalForm({onSavePrincipalData}) {
                     {pathName === '/principals/create' ? 'Save' : 'Update'}
                 </button>
             </div>
+
         </div>
     )
 }

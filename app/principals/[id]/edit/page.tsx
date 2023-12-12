@@ -2,16 +2,64 @@
 
 'use client'
 
-import {Fragment} from 'react'
+import {Fragment, useEffect, useState} from 'react'
 import Link from "next/link";
 import PrincipalForm from "../../components/form";
 import {ArrowLeftIcon} from "@heroicons/react/solid";
+import {useParams, useRouter} from "next/navigation";
+import {generateClient} from "aws-amplify/data";
+import {Schema} from "@/amplify/data/resource";
+import {pick} from "lodash";
 
+
+const client = generateClient<Schema>();
 
 export default function PrincipalCreate() {
-    const onsubmit = async (principal:['Principal'])=> {
-        console.log(2)
+
+    const params = useParams();
+    const router = useRouter();
+
+    const[principal, setPrincipal] = useState<any>();
+
+    const onsubmit = async (data:any)=> {
+        if(data.full_name){
+            const principalDetails = pick(data, ['id', 'full_name', 'email', 'is_active', 'phone', 'message']);
+            // @ts-ignore
+            const  { errors, data: principal } = await client.models.Principal.update(principalDetails)
+            if(principal && principal.id ){
+                if(data.tenures.id){
+                    const  { errors, data: newTenure } = await client.models.Tenure.update(
+                        {
+                            id:data.tenures.id,
+                            left_date: data.left_date ?? "",
+                            appointed_date: data.appointed_date ?? "",
+                            principal
+                        }
+                    )
+                }else{
+                    const  { errors, data: newTenure } = await client.models.Tenure.create(
+                        {
+                            left_date: data.left_date ?? "",
+                            appointed_date: data.appointed_date ?? "",
+                            principal
+                        }
+                    )
+                }
+            }
+            router.push('/principals');
+        }
     }
+
+    const getPrincipalDetail = async ()=> {
+        // @ts-ignore
+        const { data: principal, errors } = await client.models.Principal.get({id:params.id})
+        setPrincipal(principal)
+    }
+
+    useEffect(() => {
+        getPrincipalDetail()
+    }, []);
+
     return (
         <>
             <div className="mt-10 p-10 ">
@@ -37,7 +85,7 @@ export default function PrincipalCreate() {
                 <main>
                     <div className="max-w-full mx-auto sm:px-6 lg:px-8">
                         <div className="px-4  sm:px-0">
-                            <PrincipalForm onSavePrincipalData={onsubmit}/>
+                            <PrincipalForm onSavePrincipalData={onsubmit} data={principal}/>
                         </div>
                     </div>
                 </main>

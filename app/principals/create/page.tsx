@@ -1,30 +1,45 @@
 /* This example requires Tailwind CSS v2.0+ */
-
 'use client'
-
-import {Fragment} from 'react'
 import Link from "next/link";
 import PrincipalForm from "../components/form";
 import {ArrowLeftIcon} from "@heroicons/react/solid";
-import { generateClient } from 'aws-amplify/data';
+import {generateClient} from 'aws-amplify/data';
 import {Schema} from "@/amplify/data/resource";
+import {pick} from "lodash";
+import {useRouter} from 'next/navigation'
 
 const client = generateClient<Schema>();
 
 export default function PrincipalCreate() {
-    const onsubmit = async (principal:['Principal'])=> {
-        console.log(principal, 'date')
-             const data = {email: "test1@gmail.com", full_name: "test"}
-        // @ts-ignore
-        const  { errors, data: newTodo } = await client.models.Principal.create(data)
-        console.log(newTodo, 'create')
+
+    const router = useRouter()
+
+
+    const onsubmit = async (data:any)=> {
+        if(data.full_name){
+            const principalDetails = pick(data, ['full_name', 'email', 'is_active', 'phone', 'message']);
+            // @ts-ignore
+            const  { errors, data: principal } = await client.models.Principal.create(principalDetails)
+            if(principal && principal.id){
+                // @ts-ignore
+                const  { errors, data: newTenure } = await client.models.Tenure.create(
+                    {
+                        left_date: data.left_date ?? "",
+                        appointed_date: data.appointed_date ?? "",
+                        principal
+                    }
+                )
+            }
+            router.push('/principals');
+        }
     }
     return (
         <>
             <div className="mt-10 p-10 ">
                 <div className="flex justify-between px-4 py-8 sm:px-0 lg:px-8">
                     <header>
-                        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">npm run build
+
                             <h1 className="text-3xl font-bold leading-tight text-blue-900">Principals</h1>
                         </div>
                     </header>
@@ -44,7 +59,7 @@ export default function PrincipalCreate() {
                 <main>
                     <div className="max-w-full mx-auto sm:px-6 lg:px-8">
                         <div className="px-4  sm:px-0">
-                            <PrincipalForm onSavePrincipalData={onsubmit}/>
+                            <PrincipalForm onSavePrincipalData={onsubmit} data={[]}/>
                         </div>
                     </div>
                 </main>
