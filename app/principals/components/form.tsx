@@ -228,7 +228,7 @@ export default function PrincipalForm({onSavePrincipalData}) {
                                         Email address
                                     </label>
                                     <input
-                                        type="text"
+                                        type="email"
                                         name="email"
                                         id="email"
                                         value={email}
