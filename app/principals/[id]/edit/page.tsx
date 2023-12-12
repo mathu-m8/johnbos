@@ -9,6 +9,9 @@ import {ArrowLeftIcon} from "@heroicons/react/solid";
 
 
 export default function PrincipalCreate() {
+    const onsubmit = async (principal:['Principal'])=> {
+        console.log(2)
+    }
     return (
         <>
             <div className="mt-10 p-10 ">
@@ -34,7 +37,7 @@ export default function PrincipalCreate() {
                 <main>
                     <div className="max-w-full mx-auto sm:px-6 lg:px-8">
                         <div className="px-4  sm:px-0">
-                            <PrincipalForm/>
+                            <PrincipalForm onSavePrincipalData={onsubmit}/>
                         </div>
                     </div>
                 </main>
