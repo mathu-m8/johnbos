@@ -161,8 +161,10 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
 
     //delete tenure data
     const deleteTenureDetail = (index: number) => {
-        setSelectedTenure(index)
-        setIsOpenDeleteModel(true)
+        if(tenures.length > 0){
+            setSelectedTenure(index)
+            setIsOpenDeleteModel(true)
+        }
     };
 
     const handleAppointedDateChange = (index:any, e:any) => {
@@ -535,6 +537,7 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
                                                     min="1900-01-01"
                                                     max="3000-12-31"
                                                     onChange={(e:any) => handleAppointedDateChange(index, e)}
+                                                    required={true}
                                                 />
                                                 {/*<Datepicker*/}
                                                 {/*    value={appointedDate}*/}
@@ -558,6 +561,7 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
                                                     value={item.left_date}
                                                     min="1900-01-01"
                                                     onChange={(e:any) => handleLeftDateChange(index, e)}
+                                                    required={true}
                                                 />
                                                 {/*<Datepicker*/}
                                                 {/*    disabled={isActive}*/}
@@ -584,6 +588,7 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
                                             <button
                                                 type="button"
                                                 onClick={()=> deleteTenureDetail(index)}
+                                                disabled={tenures.length == 1}
                                                 className="ml-3 mt-6 inline-flex justify-center py-2 px-3 border shadow-sm text-sm
                                                 font-medium rounded-md text-red-600 hover:text-red-700  border-red-600
                                                 focus:outline-none focus:ring-2 transition duration-300 transform hover:scale-110
