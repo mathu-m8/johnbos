@@ -10,6 +10,7 @@ import ActivePrincipalWarningModel from './activePrincipalWarningModel'
 import {cloneDeep, maxBy} from "lodash";
 import 'react-datepicker/dist/react-datepicker.css'; // Import the styles
 import DeleteModel from "@/app/principals/components/deleteModel";
+import {el} from "date-fns/locale";
 
 function classNames(...classes:any) {
     return classes.filter(Boolean).join(' ')
@@ -193,7 +194,11 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
 
     const listTenures = async ()=> {
         const { data: tenures } = await principalData.tenures()
-        setTenures(tenures);
+        if(tenures.length){
+            setTenures(tenures);
+        }else {
+            setTenures([{appointed_date: "", left_date: "" }])
+        }
         const lastTenure = maxBy(tenures, 'appointed_date')
         // @ts-ignore
         setPrincipal({...principal, 'appointed_date': lastTenure.appointed_date ?? ""})
@@ -501,7 +506,8 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
                     {pathName === '/principals/create' ? 'Save' : 'Update'}
                 </button>
             </div>
-            {principalData?.id || addMoreTenure ?
+
+            {(principalData?.id || addMoreTenure) && tenures.length ?
                 <div className="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
                     <div className="md:grid md:grid-cols-3 md:gap-6">
                         <div className="md:col-span-3">
