@@ -4,7 +4,7 @@ import {Dialog, Transition} from '@headlessui/react'
 import {ExclamationIcon, XIcon} from '@heroicons/react/outline'
 
 // @ts-ignore
-export default function DeleteModel({open, setOpen, onDelete, message, heading}) {
+export default function ActivePrincipalWarningModel({open, setOpen, onChangeActivePrincipal}) {
     return (
         <Transition.Root show={open} as={Fragment}>
             <Dialog as="div" className="fixed z-10 inset-0 overflow-y-auto" onClose={setOpen}>
@@ -46,16 +46,20 @@ export default function DeleteModel({open, setOpen, onDelete, message, heading})
                                 </button>
                             </div>
                             <div className="sm:flex sm:items-start">
-                                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                                    <ExclamationIcon className="h-6 w-6 text-red-600" aria-hidden="true" />
+                                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 sm:mx-0 sm:h-10 sm:w-10">
+                                    <ExclamationIcon className="h-6 w-6 text-yellow-600" aria-hidden="true" />
                                 </div>
                                 <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                                     <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">
-                                        {heading}
+                                        Active Principal Already Exists
                                     </Dialog.Title>
                                     <div className="mt-2">
                                         <p className="text-sm text-gray-500">
-                                            {message}
+                                            The current principal is already marked as active. Changing the active status of
+                                            this principal will affect the existing active principal.
+                                            <br/>
+                                            Are you sure you want to proceed?
+                                            Changing the active status of this principal will potentially replace the current active principal in the system. Please review this action carefully before proceeding.
                                         </p>
                                     </div>
                                 </div>
@@ -63,10 +67,13 @@ export default function DeleteModel({open, setOpen, onDelete, message, heading})
                             <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                                 <button
                                     type="button"
-                                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-                                    onClick={() => onDelete()}
+                                    className="w-full inline-flex justify-center rounded-md border border-transparent
+                                     shadow-sm px-4 py-2 bg-blue-950 text-base font-medium text-white hover:bg-blue-900
+                                     focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3
+                                     sm:w-auto sm:text-sm"
+                                    onClick={() => onChangeActivePrincipal()}
                                 >
-                                    Delete
+                                    Change Current Principal
                                 </button>
                                 <button
                                     type="button"

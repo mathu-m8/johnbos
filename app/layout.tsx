@@ -22,12 +22,12 @@ export default function RootLayout({
     <html className="h-full" lang="en">
     <body className={`${inter.className}`}>
       <Navbar/>
-      <div className="min-w-full">
-        <main className="">
-          <ConfigureAmplifyClientSide />
-          {children}
-        </main>
-      </div>
+        <div className="min-w-full">
+          <main className="">
+            <ConfigureAmplifyClientSide />
+            {children}
+          </main>
+        </div>
       </body>
     </html>
   )
