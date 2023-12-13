@@ -62,9 +62,8 @@ export default function PrincipalsIndex() {
 
 
     const onDeletePrincipal = async ()=> {
-        console.log(selectedPrincipal)
-        const response = client.models.Principal.delete({id:selectedPrincipal})
-        listPrincipals();
+        const {data:deleteData, errors} = await client.models.Principal.delete({id:selectedPrincipal})
+        await listPrincipals();
         setIsOpenDeleteModel(false)
     }
 
