@@ -4,11 +4,10 @@ import Link from "next/link";
 import PrincipalForm from "../components/form";
 import {ArrowLeftIcon} from "@heroicons/react/solid";
 import {generateClient} from 'aws-amplify/data';
-import {Schema} from "@/amplify/data/resource";
 import {pick} from "lodash";
 import {useRouter} from 'next/navigation'
 
-const client = generateClient<Schema>();
+const client = generateClient<any>();
 
 export default function PrincipalCreate() {
 
@@ -33,14 +32,17 @@ export default function PrincipalCreate() {
             router.push('/principals');
         }
     }
+    const refreshData = ()=> {
+        console.log('refreshData')
+    }
     return (
         <>
             <div className="mt-10 p-10 ">
                 <div className="flex justify-between px-4 py-8 sm:px-0 lg:px-8">
                     <header>
-                        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">npm run build
+                        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
 
-                            <h1 className="text-3xl font-bold leading-tight text-blue-900">Principals</h1>
+                            <h1 className="text-3xl font-bold leading-tight text-blue-900">Principal Details</h1>
                         </div>
                     </header>
                     <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none lg:px-8">
@@ -59,7 +61,7 @@ export default function PrincipalCreate() {
                 <main>
                     <div className="max-w-full mx-auto sm:px-6 lg:px-8">
                         <div className="px-4  sm:px-0">
-                            <PrincipalForm onSavePrincipalData={onsubmit} data={[]}/>
+                            <PrincipalForm onSavePrincipalData={onsubmit} principalData={[]} refreshData={refreshData}/>
                         </div>
                     </div>
                 </main>

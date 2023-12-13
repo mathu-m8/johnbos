@@ -4,7 +4,7 @@ import {Dialog, Transition} from '@headlessui/react'
 import {ExclamationIcon, XIcon} from '@heroicons/react/outline'
 
 // @ts-ignore
-export default function DeleteModel({open, setOpen, onDelete}) {
+export default function DeleteModel({open, setOpen, onDelete, message, heading}) {
     return (
         <Transition.Root show={open} as={Fragment}>
             <Dialog as="div" className="fixed z-10 inset-0 overflow-y-auto" onClose={setOpen}>
@@ -51,12 +51,11 @@ export default function DeleteModel({open, setOpen, onDelete}) {
                                 </div>
                                 <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                                     <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">
-                                        Delete principal details
+                                        {heading}
                                     </Dialog.Title>
                                     <div className="mt-2">
                                         <p className="text-sm text-gray-500">
-                                            Are you sure you want to delete this principal details?
-                                            This action cannot be undone.
+                                            {message}
                                         </p>
                                     </div>
                                 </div>

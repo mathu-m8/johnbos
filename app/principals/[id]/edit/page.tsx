@@ -12,7 +12,7 @@ import {Schema} from "@/amplify/data/resource";
 import {pick} from "lodash";
 
 
-const client = generateClient<Schema>();
+const client = generateClient<any>();
 
 export default function PrincipalCreate() {
 
@@ -66,7 +66,7 @@ export default function PrincipalCreate() {
                 <div className="flex justify-between px-4 py-8 sm:px-0 lg:px-8">
                     <header>
                         <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-                            <h1 className="text-3xl font-bold leading-tight text-blue-900">Principals</h1>
+                            <h1 className="text-3xl font-bold leading-tight text-blue-900">Principal Details</h1>
                         </div>
                     </header>
                     <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none lg:px-8">
@@ -85,7 +85,7 @@ export default function PrincipalCreate() {
                 <main>
                     <div className="max-w-full mx-auto sm:px-6 lg:px-8">
                         <div className="px-4  sm:px-0">
-                            <PrincipalForm onSavePrincipalData={onsubmit} data={principal}/>
+                            <PrincipalForm onSavePrincipalData={onsubmit} principalData={principal} refreshData={getPrincipalDetail}/>
                         </div>
                     </div>
                 </main>

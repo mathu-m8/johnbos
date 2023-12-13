@@ -8,7 +8,7 @@ import {BellIcon, MenuIcon, XIcon} from '@heroicons/react/outline'
 import Image from 'next/image'
 import Logo from './logo.png'
 import Link from "next/link";
-import {usePathname} from "next/navigation";
+import {useParams, usePathname} from "next/navigation";
 
 
 const user = {
@@ -31,13 +31,12 @@ function classNames(...classes: string[]) {
 export default function Navbar() {
 
     const pathname = usePathname()
-
+    const params =  useParams()
     const navigation = [
         { name: 'Dashboard', href: '/', current: pathname === '/', pathName: '/' },
-        { name: 'Principals', href: '/principals', current: pathname === '/principals', pathName: '/principals' },
+        { name: 'Principals', href: '/principals', current: pathname === '/principals' || pathname == '/principals/create' || pathname == `/principals/${params.id}/edit`, pathName: '/principals' },
         // Add more navigation items as needed
     ];
-
     return (
         <>
             {/*{router}*/}
