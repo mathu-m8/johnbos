@@ -8,7 +8,6 @@ import PrincipalForm from "../../components/form";
 import {ArrowLeftIcon} from "@heroicons/react/solid";
 import {useParams, useRouter} from "next/navigation";
 import {generateClient} from "aws-amplify/data";
-import {Schema} from "@/amplify/data/resource";
 import {pick} from "lodash";
 
 
