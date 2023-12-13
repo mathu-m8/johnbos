@@ -42,7 +42,7 @@ export default function PrincipalsIndex() {
     // // type PrincipalWithTenures  = SelectionSet<Schema["Principal"], typeof selectionSet>;
 
 
-    const profile_url = 'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+    const profile_url = 'https://static-00.iconduck.com/assets.00/profile-circle-icon-2048x2048-cqe5466q.png'
     const [principals, setPrincipals] = useState<Schema['Principal'][]>([]);
 
     async function listPrincipals() {
