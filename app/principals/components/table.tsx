@@ -5,7 +5,7 @@ import {useEffect, useState} from "react";
 
 import {generateClient, SelectionSet} from 'aws-amplify/data';
 import {type Schema} from '@/amplify/data/resource';
-
+import ImageURL from '../../nun.jpeg'
 const people:any = [
     {
         full_name: 'Lindsay Walton',

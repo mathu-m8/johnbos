@@ -217,6 +217,10 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
         }
         refreshData()
     }
+    const onCancelTheConfirmation = async ()=> {
+        setIsActive(false)
+        setIsOpenWarningModel(false)
+    }
 
     useEffect(() => {
         if(principalData && principalData.id){
@@ -229,7 +233,7 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
     // @ts-ignore
     return (
         <div className="space-y-6 px-4 sm:px-6 lg:px-8">
-            <ActivePrincipalWarningModel  open={isOpenWaringModel} setOpen={setIsOpenWarningModel} onChangeActivePrincipal={()=> onChangeActivePrincipal()}/>
+            <ActivePrincipalWarningModel  open={isOpenWaringModel} setOpen={onCancelTheConfirmation} onChangeActivePrincipal={()=> onChangeActivePrincipal()}/>
             <DeleteModel
                 open={isOpenDeleteModel}
                 setOpen={setIsOpenDeleteModel}
