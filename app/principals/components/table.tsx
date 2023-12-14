@@ -6,6 +6,10 @@ import {useEffect, useState} from "react";
 import {generateClient, SelectionSet} from 'aws-amplify/data';
 import {type Schema} from '@/amplify/data/resource';
 import ImageURL from '../../nun.jpeg'
+import {SearchIcon} from "@heroicons/react/solid";
+// import Pagination from "@/app/componets/pagination";
+import { Pagination } from '@aws-amplify/ui-react';
+
 const people:any = [
     {
         full_name: 'Lindsay Walton',
@@ -32,11 +36,13 @@ const people:any = [
 
 const client = generateClient<Schema>();
 
-
 export default function PrincipalsIndex() {
+
     const [isOpenDeleteModel, setIsOpenDeleteModel] = useState(false)
     const [selectedPrincipal, setSelectedPrincipal] = useState('')
-
+    const [searchByName, setSearchByName] = useState<any>('');
+    const [currentPageIndex, setCurrentPageIndex] = useState(1);
+    const [hasMorePages, setHasMorePages] = useState(true);
 
     // const selectionSet = ['principal.*'] as const;
     // // type PrincipalWithTenures  = SelectionSet<Schema["Principal"], typeof selectionSet>;
@@ -44,21 +50,69 @@ export default function PrincipalsIndex() {
 
     const profile_url = 'https://static-00.iconduck.com/assets.00/profile-circle-icon-2048x2048-cqe5466q.png'
     const [principals, setPrincipals] = useState<Schema['Principal'][]>([]);
+    const [previousToken, setPreviousToken ] = useState('');
+    const [nextTokenValue, setNextToken ] = useState('');
+    const [pageTokens, setPageTokens] = useState([null]);
 
     async function listPrincipals() {
         try {
             // const response:any = []
             // @ts-ignore
-            const {data:items, errors} = await client.models.Principal.list();
-            // const {data:tenures} = await client.models.Tenure.list();
-            // console.log(tenures)
+            const {data:items, nextToken, errors} = await client.models.Principal.list();
+            setNextToken(nextToken ?? "")
             setPrincipals(items);
-            console.log(8);
         } catch (error) {
             // Handle errors here
             console.error("Error fetching principals:", error);
         }
     }
+
+    const handleNextPage = async () => {
+        if (hasMorePages && currentPageIndex === pageTokens.length) {
+            const { data: items, nextToken } = await client.models.Principal.list({
+                limit:1,
+                nextToken: pageTokens[pageTokens.length - 1]
+            });
+            setPrincipals(items);
+            if (!nextToken) {
+                setHasMorePages(false);
+            }
+
+            // @ts-ignore
+            setPageTokens([...pageTokens, nextToken]);
+        }
+
+        setCurrentPageIndex(currentPageIndex + 1);
+    };
+    const handleSearchByName = async (event: { target: { value: any; }; }) => {
+        const input = event.target.value;
+        setSearchByName(input);
+
+        // Perform search when at least 3 letters are typed
+        if (input.length >= 3) {
+            // Call a function to perform search API request or search logic
+            const {data:items, errors} = await client.models.Principal.list(
+                {
+                    filter: {
+                        full_name: {
+                            contains: searchByName
+                        }
+
+                    }
+                }
+            );
+            // const {data:tenures} = await client.models.Tenure.list();
+            // console.log(tenures)
+            setPrincipals(items);
+            // await performSearch(input);
+        } else {
+            if(input.length === 0){
+                listPrincipals();
+            }
+            // Clear the search results or handle empty search query
+            // ...
+        }
+    };
 
 
     const onDeletePrincipal = async ()=> {
@@ -82,6 +136,33 @@ export default function PrincipalsIndex() {
                 />
                 <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+
+
+                        <div className="flex-1 flex items-center justify-center mb-2 lg:ml-6 lg:justify-end">
+                            <div className="max-w-lg w-full lg:max-w-xs">
+                                <label htmlFor="search" className="sr-only">
+                                    Search
+                                </label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <SearchIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                    </div>
+                                    <input
+                                        id="search"
+                                        name="search"
+                                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md
+                                        leading-5 bg-white placeholder-gray-500 focus:outline-none
+                                         focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-950
+                                         focus:border-blue-950 sm:text-sm"
+                                        placeholder="Search by full name"
+                                        type="search"
+                                        value={searchByName}
+                                        onChange={handleSearchByName}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                             <table className="min-w-full divide-y divide-gray-300">
                                 <thead className="bg-gray-50">
@@ -132,9 +213,11 @@ export default function PrincipalsIndex() {
                                                {/*    <div className="text-gray-900">{principal.appointed_date ?? "Null"}</div>*/}
                                                {/*</td>*/}
                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                <span className={principal.is_active ? 'inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800' : 'inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold leading-5 text-red-800'}>
-                                  {principal.is_active  ? 'Active' : 'Inactive'}
-                                </span>
+                                                    <span className={principal.is_active ?
+                                                        'inline-flex rounded-full bg-green-100 px-2 ' +
+                                                        'text-xs font-semibold leading-5 text-green-800' : 'inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold leading-5 text-red-800'}>
+                                                      {principal.is_active  ? 'Active' : 'Inactive'}
+                                                    </span>
                                                </td>
                                                <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 space-x-2">
                                                    <a href={`/principals/${principal.id}/edit`} className="text-blue-950 hover:text-blue-900">
@@ -151,6 +234,11 @@ export default function PrincipalsIndex() {
                                                </td>
                                            </tr>
                                        ))}
+                                       {/*<tr>*/}
+                                       {/*    <td className="whitespace-nowrap py-4 pl-4 pr-3  sm:pl-6 text-center text-gray-500 text-md">*/}
+                                       {/*        <Pagination/>*/}
+                                       {/*    </td>*/}
+                                       {/*</tr>*/}
                                    </>
                                 :
                                     <tr>
@@ -159,6 +247,16 @@ export default function PrincipalsIndex() {
                                 }
                                 </tbody>
                             </table>
+                            {/*<div className=" bg-white">*/}
+                            {/*    <Pagination*/}
+                            {/*        currentPage={currentPageIndex}*/}
+                            {/*        totalPages={pageTokens.length}*/}
+                            {/*        hasMorePages={hasMorePages}*/}
+                            {/*        onNext={handleNextPage}*/}
+                            {/*        onPrevious={() => setCurrentPageIndex(currentPageIndex - 1)}*/}
+                            {/*        onChange={(pageIndex:any) => setCurrentPageIndex(pageIndex)}*/}
+                            {/*    />*/}
+                            {/*</div>*/}
                         </div>
                     </div>
                 </div>

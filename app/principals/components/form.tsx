@@ -5,12 +5,12 @@ import {DocumentIcon, PlusIcon, TrashIcon} from "@heroicons/react/solid";
 import {Switch} from "@headlessui/react";
 import {usePathname} from "next/navigation";
 import {generateClient} from "aws-amplify/data";
-import {Schema} from "@/amplify/data/resource";
 import ActivePrincipalWarningModel from './activePrincipalWarningModel'
 import {cloneDeep, maxBy} from "lodash";
 import 'react-datepicker/dist/react-datepicker.css'; // Import the styles
 import DeleteModel from "@/app/principals/components/deleteModel";
-import {el} from "date-fns/locale";
+import * as Storage from 'aws-amplify/storage';
+import moment from "moment";
 
 function classNames(...classes:any) {
     return classes.filter(Boolean).join(' ')
@@ -46,10 +46,31 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
         // console.log('Selected file:', file);
         const file = event.target.files[0];
         const fileReader = new FileReader();
-        fileReader.addEventListener("load", () => {
-            if(fileReader.result){
+        fileReader.addEventListener("load", async () => {
+            if (fileReader.result) {
                 // @ts-ignore
                 setPreviewImage(fileReader.result);
+                console.log(Storage)
+                try {
+                    const result = await Storage.uploadData({
+                        key: 'profile_url',
+                        data: file
+                    }).result;
+                    console.log('Succeeded: ', result);
+                } catch (error) {
+                    console.log('Error : ', error);
+                }
+                // bucket.upload({
+                //     ACL: 'public-read',
+                //     Body: fs.createReadStream('./test.jpg'),
+                //     // file upload by below name
+                //     Key: 'aws_test.jpg',
+                //     ContentType: 'application/octet-stream' // force download if it's accessed as a top location
+                // },(err: any, response: any)=>{
+                //     console.log(err, response)
+                // });
+
+
             }
         });
         fileReader.readAsDataURL(file);
@@ -66,6 +87,7 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
         appointed_date: "",
         left_date: "",
         message: "",
+        tenure_id:""
     });
 
     const { full_name, email, is_active, phone, appointed_date, left_date, message } = principal;
@@ -109,6 +131,9 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
 
 
     const handleIActiveChange= ()=> {
+        if(isActive){
+            setPrincipal({...principal, 'left_date': ""})
+        }
         setIsActive(!isActive)
     }
 
@@ -186,6 +211,7 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
 
     const onDeleteTenure = async ()=> {
         const updatedTenures = cloneDeep(tenures);
+        console.log(tenures[selectedTenure], 'k')
         if(tenures[selectedTenure]?.id){
             await client.models.Tenure.delete({id:tenures[selectedTenure].id})
         }
@@ -194,16 +220,35 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
         setIsOpenDeleteModel(false)
     }
 
+    const convertDates = (data:any) => {
+        console.log(data, 'data')
+        return data.map((dateObj:any) => {
+            const convertedAppointedDate = moment(dateObj.appointed_date).format('YYYY-MM-DD');
+            const convertedLeftDate = moment(dateObj.left_date).format('YYYY-MM-DD');
+            const tenureId = dateObj.id
+
+            return {
+                appointed_date: convertedAppointedDate,
+                left_date: convertedLeftDate,
+                id:tenureId
+            };
+        });
+    };
+
+
     const listTenures = async ()=> {
         const { data: tenures } = await principalData.tenures()
+        let lastTenure;
         if(tenures.length){
-            setTenures(tenures);
+            const formattedDates = convertDates(tenures);
+            setTenures(formattedDates);
+            lastTenure = maxBy(formattedDates, 'appointed_date')
+
         }else {
             setTenures([{appointed_date: "", left_date: "" }])
         }
-        const lastTenure = maxBy(tenures, 'appointed_date')
         // @ts-ignore
-        setPrincipal({...principal, 'appointed_date': lastTenure.appointed_date ?? ""})
+        setPrincipal({...principal, 'appointed_date':lastTenure.appointed_date ?? "", 'left_date':lastTenure.left_date ?? "" , 'tenure_id':lastTenure.id ?? "" })
     }
 
     const onSaveOrUpdateTenureDetails = async (index:any)=> {
@@ -414,7 +459,7 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
                                         Phone
                                     </label>
                                     <input
-                                        type="text"
+                                        type="number"
                                         name="phone"
                                         value={phone}
                                         onChange={onChange}

@@ -26,10 +26,11 @@ export default function PrincipalCreate() {
             // @ts-ignore
             const  { errors, data: principal } = await client.models.Principal.update(principalDetails)
             if(principal && principal.id ){
-                if(data.tenures.id){
+                console.log(data)
+                if(data?.tenure_id){
                     const  { errors, data: newTenure } = await client.models.Tenure.update(
                         {
-                            id:data.tenures.id,
+                            id:data.tenure_id,
                             left_date: data.left_date ?? "",
                             appointed_date: data.appointed_date ?? "",
                             principal
