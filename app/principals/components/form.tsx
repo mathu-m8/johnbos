@@ -482,6 +482,7 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
                                         type="date"
                                         value={appointed_date}
                                         min="1900-01-01"
+                                        max={moment(new Date()).format('YYYY-MM-DD')}
                                         onChange={onChange}
                                     />
                                     {/*<Datepicker*/}
@@ -584,7 +585,7 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
                                                     type="date"
                                                     value={item.appointed_date}
                                                     min="1900-01-01"
-                                                    max="3000-12-31"
+                                                    max={moment(new Date()).format('YYYY-MM-DD')}
                                                     onChange={(e:any) => handleAppointedDateChange(index, e)}
                                                     required={true}
                                                 />
