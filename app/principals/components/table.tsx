@@ -4,13 +4,14 @@ import DeleteModel from './deleteModel'
 import {useEffect, useState} from "react";
 
 import {generateClient, SelectionSet} from 'aws-amplify/data';
+import {list, getUrl} from 'aws-amplify/storage';
 import {type Schema} from '@/amplify/data/resource';
 import ImageURL from '../../nun.jpeg'
 import {SearchIcon} from "@heroicons/react/solid";
-// import Pagination from "@/app/componets/pagination";
-import { Pagination } from '@aws-amplify/ui-react';
+import Pagination from "@/app/componets/pagination";
+// import { Pagination } from '@aws-amplify/ui-react';
 
-const people:any = [
+const people: any = [
     {
         full_name: 'Lindsay Walton',
         appointed_date: '2000-12-23',
@@ -33,7 +34,6 @@ const people:any = [
 ]
 
 
-
 const client = generateClient<Schema>();
 
 export default function PrincipalsIndex() {
@@ -50,27 +50,45 @@ export default function PrincipalsIndex() {
 
     const profile_url = 'https://static-00.iconduck.com/assets.00/profile-circle-icon-2048x2048-cqe5466q.png'
     const [principals, setPrincipals] = useState<Schema['Principal'][]>([]);
-    const [previousToken, setPreviousToken ] = useState('');
-    const [nextTokenValue, setNextToken ] = useState('');
+    const [previousToken, setPreviousToken] = useState('');
+    const [nextTokenValue, setNextToken] = useState('');
     const [pageTokens, setPageTokens] = useState([null]);
 
     async function listPrincipals() {
         try {
             // const response:any = []
             // @ts-ignore
-            const {data:items, nextToken, errors} = await client.models.Principal.list();
+            const {data: items, nextToken, errors} = await client.models.Principal.list();
             setNextToken(nextToken ?? "")
+            await setProfileImage(items);
             setPrincipals(items);
         } catch (error) {
             // Handle errors here
             console.error("Error fetching principals:", error);
         }
     }
+    const setProfileImage = async (principals:any)=> {
+        return principals.map(async (principal:any)=> {
+            if(principal.profile_url) {
+                const imageDetails = await getUrl({key:principal.profile_url})
+                console.log(imageDetails.url.href, 'image')
+                principal.profile_url = imageDetails.url.href
+            }
+            // console.log(principal, 'principal')
+        })
+    }
+
+
+    list().then(data => {
+        console.log(data)
+    }).catch(err => {
+        console.log(err)
+    })
 
     const handleNextPage = async () => {
         if (hasMorePages && currentPageIndex === pageTokens.length) {
-            const { data: items, nextToken } = await client.models.Principal.list({
-                limit:1,
+            const {data: items, nextToken} = await client.models.Principal.list({
+                limit: 1,
                 nextToken: pageTokens[pageTokens.length - 1]
             });
             setPrincipals(items);
@@ -91,7 +109,7 @@ export default function PrincipalsIndex() {
         // Perform search when at least 3 letters are typed
         if (input.length >= 3) {
             // Call a function to perform search API request or search logic
-            const {data:items, errors} = await client.models.Principal.list(
+            const {data: items, errors} = await client.models.Principal.list(
                 {
                     filter: {
                         full_name: {
@@ -106,7 +124,7 @@ export default function PrincipalsIndex() {
             setPrincipals(items);
             // await performSearch(input);
         } else {
-            if(input.length === 0){
+            if (input.length === 0) {
                 listPrincipals();
             }
             // Clear the search results or handle empty search query
@@ -115,17 +133,22 @@ export default function PrincipalsIndex() {
     };
 
 
-    const onDeletePrincipal = async ()=> {
-        const {data:deleteData, errors} = await client.models.Principal.delete({id:selectedPrincipal})
+    const onDeletePrincipal = async () => {
+        const {data: deleteData, errors} = await client.models.Principal.delete({id: selectedPrincipal})
         await listPrincipals();
         setIsOpenDeleteModel(false)
     }
 
-    useEffect( () => {
+    useEffect(() => {
         listPrincipals()
     }, []);
+
+
+
+
     return (
         <div className="px-4 sm:px-6 lg:px-8">
+
             <div className=" flex flex-col">
                 <DeleteModel
                     open={isOpenDeleteModel}
@@ -144,8 +167,9 @@ export default function PrincipalsIndex() {
                                     Search
                                 </label>
                                 <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <SearchIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                    <div
+                                        className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <SearchIcon className="h-5 w-5 text-gray-400" aria-hidden="true"/>
                                     </div>
                                     <input
                                         id="search"
@@ -167,19 +191,22 @@ export default function PrincipalsIndex() {
                             <table className="min-w-full divide-y divide-gray-300">
                                 <thead className="bg-gray-50">
                                 <tr>
-                                    <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                                    <th scope="col"
+                                        className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
                                         Full Name
                                     </th>
                                     {/*<th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">*/}
                                     {/*    Appointed date*/}
                                     {/*</th>*/}
-                                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                    <th scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                         Phone
                                     </th>
                                     {/*<th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">*/}
                                     {/*    Left Date*/}
                                     {/*</th>*/}
-                                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                    <th scope="col"
+                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                         Status
                                     </th>
                                     <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
@@ -189,60 +216,68 @@ export default function PrincipalsIndex() {
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 bg-white">
                                 {principals.length ?
-                                   <>
-                                       {principals.map((principal:any) => (
-                                           <tr key={principal.email}>
-                                               <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                                                   <div className="flex items-center">
-                                                       <div className="h-10 w-10 flex-shrink-0">
-                                                           <img className="h-10 w-10 rounded-full" src={principal.profile_url ?? profile_url} alt="" />
-                                                       </div>
-                                                       <div className="ml-4">
-                                                           <div className="font-medium text-gray-900">{principal.full_name ?? "Null"}</div>
-                                                           <div className="text-gray-500">{principal.email ?? "Null"}</div>
-                                                       </div>
-                                                   </div>
-                                               </td>
-                                               <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                   <div className="text-gray-900">{principal.phone ? principal.phone : 'Null'}</div>
-                                               </td>
-                                               {/*<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">*/}
-                                               {/*    <div className="text-gray-900">{principal.appointed_date ?? "Null"}</div>*/}
-                                               {/*</td>*/}
-                                               {/*<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">*/}
-                                               {/*    <div className="text-gray-900">{principal.appointed_date ?? "Null"}</div>*/}
-                                               {/*</td>*/}
-                                               <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                    <>
+                                        {principals.map((principal: any) => (
+                                            <tr key={principal.email}>
+                                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                                                    <div className="flex items-center">
+                                                        <div className="h-10 w-10 flex-shrink-0">
+                                                            <img className="h-10 w-10 rounded-full"
+                                                                 src={principal.profile_url && principal.profile_url !== "" ? principal.profile_url : profile_url} alt=""/>
+                                                        </div>
+                                                        <div className="ml-4">
+                                                            <div
+                                                                className="font-medium text-gray-900">{principal.full_name ?? "Null"}</div>
+                                                            <div
+                                                                className="text-gray-500">{principal.email ?? "Null"}</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                    <div
+                                                        className="text-gray-900">{principal.phone ? principal.phone : 'Null'}</div>
+                                                </td>
+                                                {/*<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">*/}
+                                                {/*    <div className="text-gray-900">{principal.appointed_date ?? "Null"}</div>*/}
+                                                {/*</td>*/}
+                                                {/*<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">*/}
+                                                {/*    <div className="text-gray-900">{principal.appointed_date ?? "Null"}</div>*/}
+                                                {/*</td>*/}
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                                     <span className={principal.is_active ?
                                                         'inline-flex rounded-full bg-green-100 px-2 ' +
                                                         'text-xs font-semibold leading-5 text-green-800' : 'inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold leading-5 text-red-800'}>
-                                                      {principal.is_active  ? 'Active' : 'Inactive'}
+                                                      {principal.is_active ? 'Active' : 'Inactive'}
                                                     </span>
-                                               </td>
-                                               <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 space-x-2">
-                                                   <a href={`/principals/${principal.id}/edit`} className="text-blue-950 hover:text-blue-900">
-                                                       Edit
-                                                       <span className="sr-only">, {principal.name}</span>
-                                                   </a>
-                                                   <button type="button" className="text-red-600 hover:text-red-900"  onClick={(value)=> {
-                                                       setIsOpenDeleteModel(true);
-                                                       setSelectedPrincipal(principal.id)
-                                                   }}>
-                                                       Delete
-                                                       <span className="sr-only">, {principal.name}</span>
-                                                   </button>
-                                               </td>
-                                           </tr>
-                                       ))}
-                                       {/*<tr>*/}
-                                       {/*    <td className="whitespace-nowrap py-4 pl-4 pr-3  sm:pl-6 text-center text-gray-500 text-md">*/}
-                                       {/*        <Pagination/>*/}
-                                       {/*    </td>*/}
-                                       {/*</tr>*/}
-                                   </>
-                                :
+                                                </td>
+                                                <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 space-x-2">
+                                                    <a href={`/principals/${principal.id}/edit`}
+                                                       className="text-blue-950 hover:text-blue-900">
+                                                        Edit
+                                                        <span className="sr-only">, {principal.name}</span>
+                                                    </a>
+                                                    <button type="button" className="text-red-600 hover:text-red-900"
+                                                            onClick={(value) => {
+                                                                setIsOpenDeleteModel(true);
+                                                                setSelectedPrincipal(principal.id)
+                                                            }}>
+                                                        Delete
+                                                        <span className="sr-only">, {principal.name}</span>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {/*<tr>*/}
+                                        {/*    <td className="whitespace-nowrap py-4 pl-4 pr-3  sm:pl-6 text-center text-gray-500 text-md">*/}
+                                        {/*        <Pagination/>*/}
+                                        {/*    </td>*/}
+                                        {/*</tr>*/}
+                                    </>
+                                    :
                                     <tr>
-                                        <td className="whitespace-nowrap py-4 pl-4 pr-3  sm:pl-6 text-center text-gray-500 text-md" colSpan={5}>No data available in table</td>
+                                        <td className="whitespace-nowrap py-4 pl-4 pr-3  sm:pl-6 text-center text-gray-500 text-md"
+                                            colSpan={5}>No data available in table
+                                        </td>
                                     </tr>
                                 }
                                 </tbody>
@@ -254,7 +289,7 @@ export default function PrincipalsIndex() {
                             {/*        hasMorePages={hasMorePages}*/}
                             {/*        onNext={handleNextPage}*/}
                             {/*        onPrevious={() => setCurrentPageIndex(currentPageIndex - 1)}*/}
-                            {/*        onChange={(pageIndex:any) => setCurrentPageIndex(pageIndex)}*/}
+                            {/*        onChange={(pageIndex: any) => setCurrentPageIndex(pageIndex)}*/}
                             {/*    />*/}
                             {/*</div>*/}
                         </div>

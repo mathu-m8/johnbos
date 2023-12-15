@@ -11,6 +11,7 @@ import 'react-datepicker/dist/react-datepicker.css'; // Import the styles
 import DeleteModel from "@/app/principals/components/deleteModel";
 import * as Storage from 'aws-amplify/storage';
 import moment from "moment";
+import {uploadData} from 'aws-amplify/storage';
 
 function classNames(...classes:any) {
     return classes.filter(Boolean).join(' ')
@@ -40,41 +41,7 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
         }
     };
 
-    const handleFileChange = (event:any) => {
-        // const file = event.target.files[0];
-        // Handle the file selection
-        // console.log('Selected file:', file);
-        const file = event.target.files[0];
-        const fileReader = new FileReader();
-        fileReader.addEventListener("load", async () => {
-            if (fileReader.result) {
-                // @ts-ignore
-                setPreviewImage(fileReader.result);
-                console.log(Storage)
-                try {
-                    const result = await Storage.uploadData({
-                        key: 'profile_url',
-                        data: file
-                    }).result;
-                    console.log('Succeeded: ', result);
-                } catch (error) {
-                    console.log('Error : ', error);
-                }
-                // bucket.upload({
-                //     ACL: 'public-read',
-                //     Body: fs.createReadStream('./test.jpg'),
-                //     // file upload by below name
-                //     Key: 'aws_test.jpg',
-                //     ContentType: 'application/octet-stream' // force download if it's accessed as a top location
-                // },(err: any, response: any)=>{
-                //     console.log(err, response)
-                // });
 
-
-            }
-        });
-        fileReader.readAsDataURL(file);
-    };
     // const router = useRouter();
     const pathName = usePathname();
 
@@ -87,10 +54,11 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
         appointed_date: "",
         left_date: "",
         message: "",
-        tenure_id:""
+        tenure_id:"",
+        profile_url:""
     });
 
-    const { full_name, email, is_active, phone, appointed_date, left_date, message } = principal;
+    const { full_name, email, is_active, phone, appointed_date, left_date, message, profile_url } = principal;
 
 
     const onChange = (e:any) =>{
@@ -117,6 +85,31 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
         // API
     }
 
+    const handleFileChange = (event:any) => {
+        const file = event.target.files[0];
+        const fileReader = new FileReader();
+        fileReader.addEventListener("load", async () => {
+            if (fileReader.result) {
+                // @ts-ignore
+                setPreviewImage(fileReader.result);
+                console.log(Storage)
+                try {
+                    const result = await uploadData({
+                        key: file.name,
+                        data: file
+                    }).result;
+                    console.log('Succeeded: ', result);
+                    console.log(result.key, 'key')
+                    setPrincipal({...principal, 'profile_url': result?.key})
+                } catch (error) {
+                    console.log('Error : ', error);
+                }
+
+
+            }
+        });
+        fileReader.readAsDataURL(file);
+    };
     const handleSelectImage = (event:any) => {
         const file = event.target.files[0];
         const fileReader = new FileReader();
@@ -272,6 +265,7 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
             listTenures()
             setIsActive(principalData.is_active)
             setPrincipal(principalData)
+            setPreviewImage(principalData.profile_url ?? previewImage);
         }
     }, [principalData]);
 
@@ -407,7 +401,7 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
 
                                 <div className="col-span-6 sm:col-span-3">
                                     <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                                        Email address
+                                        Email
                                     </label>
                                     <input
                                         type="email"
@@ -517,7 +511,6 @@ export default function PrincipalForm({onSavePrincipalData, principalData, refre
                                         {/*    onChange={(value:any)=> setLeftDate(value)}*/}
                                         {/*/>*/}
                                     </div>
-
                                 </div>
                                 <div className="col-span-6 sm:col-span-6">
                                     <label htmlFor="message" className="block text-sm font-medium text-gray-700">

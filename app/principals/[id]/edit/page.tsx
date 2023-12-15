@@ -9,6 +9,7 @@ import {ArrowLeftIcon} from "@heroicons/react/solid";
 import {useParams, useRouter} from "next/navigation";
 import {generateClient} from "aws-amplify/data";
 import {pick} from "lodash";
+import {getUrl} from "aws-amplify/storage";
 
 
 const client = generateClient<any>();
@@ -22,7 +23,7 @@ export default function PrincipalCreate() {
 
     const onsubmit = async (data:any)=> {
         if(data.full_name){
-            const principalDetails = pick(data, ['id', 'full_name', 'email', 'is_active', 'phone', 'message']);
+            const principalDetails = pick(data, ['id', 'full_name', 'email', 'is_active', 'phone', 'message', 'profile_url']);
             // @ts-ignore
             const  { errors, data: principal } = await client.models.Principal.update(principalDetails)
             if(principal && principal.id ){
@@ -53,6 +54,10 @@ export default function PrincipalCreate() {
     const getPrincipalDetail = async ()=> {
         // @ts-ignore
         const { data: principal, errors } = await client.models.Principal.get({id:params.id})
+        if(principal.profile_url){
+            const imageDetails  = await getUrl({key:principal.profile_url})
+            principal.profile_url = imageDetails.url.href
+        }
         setPrincipal(principal)
     }
 

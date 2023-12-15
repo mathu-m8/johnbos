@@ -16,7 +16,8 @@ export default function PrincipalCreate() {
 
     const onsubmit = async (data:any)=> {
         if(data.full_name){
-            const principalDetails = pick(data, ['full_name', 'email', 'is_active', 'phone', 'message']);
+            console.log(data.profile_url, 'k')
+            const principalDetails = pick(data, ['full_name', 'email', 'is_active', 'phone', 'message', 'profile_url']);
             // @ts-ignore
             const  { errors, data: principal } = await client.models.Principal.create(principalDetails)
             if(principal && principal.id){
